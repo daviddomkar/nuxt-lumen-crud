@@ -17,3 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('rooms', 'RoomController@index');
+Route::get('rooms/{room}', 'RoomController@show');
+Route::post('rooms', 'RoomController@store');
+Route::put('rooms/{room}', 'RoomController@update');
+Route::delete('rooms/{room}', 'RoomController@delete');

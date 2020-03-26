@@ -1,10 +1,9 @@
 {
-    "name": "laravel/laravel",
+    "name": "david-domkar/nuxt-laravel-crud",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "CRUD System using Laravel and Nuxt.",
     "keywords": [
-        "framework",
-        "laravel"
+        "crud"
     ],
     "license": "MIT",
     "require": {
