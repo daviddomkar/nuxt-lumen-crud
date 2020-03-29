@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
-use \Validator;
+use Validator;
 use App\User;
 
 class AuthController extends Controller
@@ -21,8 +21,8 @@ class AuthController extends Controller
 
         $credentials = $request->only(['username', 'password']);
 
-        if (! $token = Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        if (!$token = Auth::attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         return $this->respondWithToken($token);
@@ -30,6 +30,8 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        return User::all();
+        Auth::logout();
+
+        return response()->json(null, 204);
     }
 }
