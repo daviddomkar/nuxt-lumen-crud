@@ -11,7 +11,7 @@ use App\User;
 
 class RoomController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $data = $request->all();
 
@@ -23,9 +23,7 @@ class RoomController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $user = User::findOrFail($data['user_id']);
-
-        $rooms = array_key_exists('user_id', $data) ? [Room::findOrFail($user['room_id'])] : Room::all();
+        $rooms = array_key_exists('user_id', $data) ? [Room::findOrFail(User::findOrFail($data['user_id'])['room_id'])] : Room::all();
 
         return response()->json($rooms, 200);
     }

@@ -23,15 +23,15 @@ class KeyController extends Controller
         }
 
         if (array_key_exists('user_id', $data) && array_key_exists('room_id', $data)) {
-          return response()->json(Key::where('room_id', $data['room_id'])->where('user_id', $data['user_id'])->get(), 200);
+            return response()->json(Key::where('room_id', $data['room_id'])->where('user_id', $data['user_id'])->get(), 200);
         }
 
         if (array_key_exists('user_id', $data)) {
-          return response()->json(Key::where('user_id', $data['user_id'])->get(), 200);
+            return response()->json(Key::where('user_id', $data['user_id'])->get(), 200);
         }
 
         if (array_key_exists('room_id', $data)) {
-          return response()->json(Key::where('room_id', $data['room_id'])->get(), 200);
+            return response()->json(Key::where('room_id', $data['room_id'])->get(), 200);
         }
 
         return response()->json(Key::all(), 200);
