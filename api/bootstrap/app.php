@@ -44,8 +44,7 @@ $app->singleton(
 );
 
 $app->singleton(
-    Illuminate\Contracts\Console\Kernel::class,
-    App\Console\Kernel::class
+    Illuminate\Contracts\Console\Kernel::class
 );
 
 /*
@@ -72,11 +71,6 @@ $app->configure('app');
 |
 */
 
-// $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
-// ]);
-
-
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
 ]);
@@ -95,10 +89,6 @@ $app->routeMiddleware([
 | totally optional, so you are not required to uncomment this line.
 |
 */
-
-// $app->register(App\Providers\AppServiceProvider::class);
-//$app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
 
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 
