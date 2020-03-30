@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app>
-      <v-toolbar-title>Nuxt + Lumen CRUD</v-toolbar-title>
+      <v-toolbar-title>Nuxt Lumen CRUD</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn
         icon
@@ -24,11 +24,6 @@
         <nuxt />
       </v-container>
     </v-content>
-    <v-footer app>
-      <v-col class="text-center" cols="12">
-        {{ new Date().getFullYear() }} — <strong>David Domkář</strong>
-      </v-col>
-    </v-footer>
   </v-app>
 </template>
 
