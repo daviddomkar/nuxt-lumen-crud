@@ -1,5 +1,5 @@
 <template>
-  <v-progress-circular size="50" indeterminate color="primary" />
+  <span>profile</span>
 </template>
 
 <script lang="ts">

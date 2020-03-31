@@ -33,15 +33,19 @@ const config: Configuration = {
   /*
    ** Customize the progress-bar color
    */
-  loading: { color: '#1EB980' },
+  loading: { color: '#B15DFF' },
   /*
    ** Global CSS
    */
-  css: ['@/assets/overrides.sass'],
+  css: ['@/assets/overrides.sass', '@/assets/main.scss'],
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['@/plugins/core.ts'],
+  plugins: [
+    '@/plugins/core.ts',
+    '@/plugins/vee-validate.ts',
+    { src: '@/plugins/state.ts', mode: 'client' },
+  ],
   /*
    ** Nuxt.js dev-modules
    */
@@ -52,10 +56,6 @@ const config: Configuration = {
     '@nuxtjs/vuetify',
   ],
   /*
-   ** Nuxt.js modules
-   */
-  modules: ['@nuxtjs/axios', '@nuxtjs/dotenv'],
-  /*
    ** TypeScript module configuration
    */
   typescript: {
@@ -63,11 +63,6 @@ const config: Configuration = {
       eslint: true,
     },
   },
-  /*
-   ** Axios module configuration
-   ** See https://axios.nuxtjs.org/options
-   */
-  axios: {},
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module
@@ -82,6 +77,7 @@ const config: Configuration = {
    ** Build configuration
    */
   build: {
+    transpile: ['vee-validate/dist/rules'],
     /*
      ** You can extend webpack config here
      */

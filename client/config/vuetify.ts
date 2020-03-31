@@ -3,7 +3,7 @@ export default {
     dark: true,
     themes: {
       dark: {
-        primary: '#1EB980',
+        primary: '#B15DFF',
         secondary: '#045D56',
         tertiary: '#FF6859',
         quaternary: '#FFCF44',
@@ -14,5 +14,8 @@ export default {
     options: {
       customProperties: true,
     },
+  },
+  icons: {
+    iconfont: 'mdiSvg',
   },
 };

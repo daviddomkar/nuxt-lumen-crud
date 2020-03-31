@@ -29,11 +29,9 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
-    public function logout(Request $request)
+    public function profile(Request $request)
     {
-        Auth::logout();
-
-        return response()->json(null, 204);
+        return response()->json(Auth::user(), 200);
     }
 
     public function changePassword(Request $request) 
@@ -53,6 +51,13 @@ class AuthController extends Controller
         $data['password'] = Hash::make($data['password']);
 
         $user->update($data);
+
+        return response()->json(null, 204);
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
 
         return response()->json(null, 204);
     }
