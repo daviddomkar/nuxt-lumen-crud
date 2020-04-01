@@ -40,13 +40,17 @@ class RoomController extends Controller
         $data = $request->all();
 
         $validator = Validator::make($data, [
-            'number' => 'required|unique:rooms|digits:3',
+            'number' => 'required|string|unique:rooms|digits:3',
             'name' => 'required|string|min:2|max:255',
-            'phone' => 'unique:rooms|digits:4',
+            'phone' => ['string', 'unique:rooms', 'regex:/^\d{4}|^$/'],
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
+        }
+
+        if (array_key_exists('phone', $data) && strlen($data['phone']) === 0) {
+            $data['phone'] = null;
         }
 
         $room = Room::create($data);
@@ -61,13 +65,17 @@ class RoomController extends Controller
         $data = $request->all();
 
         $validator = Validator::make($data, [
-            'number' => ['required_without_all:name,phone', 'digits:3', Rule::unique('rooms')->ignore($room)],
-            'name' => 'required_without_all:number,phone|string|min:2|max:255',
-            'phone' => ['required_without_all:number,name', 'digits:4', Rule::unique('rooms')->ignore($room)],
+            'number' => ['string', 'digits:3', Rule::unique('rooms')->ignore($room)],
+            'name' => 'string|min:2|max:255',
+            'phone' => ['string', 'regex:/^\d{4}|^$/', Rule::unique('rooms')->ignore($room)],
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
+        }
+
+        if (array_key_exists('phone', $data) && strlen($data['phone']) === 0) {
+            $data['phone'] = null;
         }
 
         $room->update($data);
@@ -82,7 +90,7 @@ class RoomController extends Controller
         $users = User::where('room_id', $room['id'])->get();
 
         if ($users->isNotEmpty()) {
-            return response()->json(['error' => 'Method not allowed'], 405);
+            return response()->json(['error' => 'Forbidden'], 403);
         }
 
         $keys = Key::where('room_id', $room['id'])->get();

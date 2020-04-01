@@ -46,6 +46,18 @@ const config: Configuration = {
     '@/plugins/vee-validate.ts',
     { src: '@/plugins/state.ts', mode: 'client' },
   ],
+  modules: [
+    [
+      'vue-currency-filter/nuxt',
+      {
+        symbol: 'Kč',
+        thousandsSeparator: ',',
+        fractionCount: 0,
+        symbolPosition: 'back',
+        symbolSpacing: true,
+      },
+    ],
+  ],
   /*
    ** Nuxt.js dev-modules
    */

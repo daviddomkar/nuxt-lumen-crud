@@ -39,6 +39,7 @@
           <v-btn
             class="mt-6"
             color="primary"
+            :loading="loading"
             block
             @click="submit($refs.observer)"
             @keyup.enter="submit($refs.observer)"
@@ -49,7 +50,7 @@
       </form>
     </validation-observer>
     <v-snackbar v-model="snackbar" color="tertiary" :timeout="20000000">
-      Přihlášení se nezdařilo, zkontrolujte své údaje!
+      Login failed, check your credentials!
       <v-btn icon @click="snackbar = false">
         <v-icon>{{ mdiClose }}</v-icon>
       </v-btn>
@@ -70,6 +71,12 @@ import { login, getProfile } from '@/utils/api';
 import authStore from '@/stores/auth';
 
 export default defineComponent({
+  // @ts-ignore
+  head() {
+    return {
+      title: 'Login',
+    };
+  },
   data() {
     return {
       mdiClose,
@@ -78,6 +85,7 @@ export default defineComponent({
   setup(_, { root }) {
     const username = ref('');
     const password = ref('');
+    const loading = ref(false);
 
     const snackbar = ref(false);
 
@@ -86,6 +94,7 @@ export default defineComponent({
     const submit = async (validator: { validate: () => Promise<boolean> }) => {
       if (await validator.validate()) {
         try {
+          loading.value = true;
           const data = (await login(username.value, password.value)).data;
           const token: string = data.token;
 
@@ -95,8 +104,10 @@ export default defineComponent({
 
           setProfile(profile);
 
+          loading.value = false;
           root.$router.replace('/users');
         } catch (e) {
+          loading.value = false;
           snackbar.value = true;
         }
       }
@@ -105,6 +116,7 @@ export default defineComponent({
     return {
       username,
       password,
+      loading,
       snackbar,
       submit,
     };

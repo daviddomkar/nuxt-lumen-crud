@@ -7,19 +7,42 @@
       :loading="loading"
       loading-text="Loading data..."
       hide-default-footer
+      disable-pagination
+      @click:row="handleClick"
     >
       <template v-slot:top>
         <v-toolbar flat color="#272727">
           <v-toolbar-title>Rooms</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn color="primary" dark @click.stop="newRoom">New Room</v-btn>
+          <v-btn
+            v-if="isAdmin"
+            color="primary"
+            dark
+            @click.stop="newRoom($refs.roomDialog)"
+            >New Room</v-btn
+          >
           <v-dialog
             v-if="isAdmin"
             v-model="dialog"
             max-width="500px"
             @click:outside="closeDialog"
           >
-            <room-dialog :edited-room="editedRoom" @close="closeDialog" />
+            <room-dialog
+              ref="roomDialog"
+              :edited-room="editedRoom"
+              @close="closeDialog"
+            />
+          </v-dialog>
+          <v-dialog
+            v-if="isAdmin"
+            v-model="deleteDialog"
+            max-width="500px"
+            @click:outside="closeDeleteDialog"
+          >
+            <room-delete-dialog
+              :edited-room="editedRoom"
+              @close="closeDeleteDialog"
+            />
           </v-dialog>
         </v-toolbar>
       </template>
@@ -38,20 +61,27 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from '@vue/composition-api';
-import { mdiClose, mdiPencil, mdiDelete } from '@mdi/js';
+import { mdiPencil, mdiDelete } from '@mdi/js';
 import { getRooms } from '@/utils/api';
 import authStore from '@/stores/auth';
 import roomsStore, { Room } from '@/stores/rooms';
 
 import RoomDialog from '@/components/RoomDialog.vue';
+import RoomDeleteDialog from '@/components/RoomDeleteDialog.vue';
 
 export default defineComponent({
   components: {
     RoomDialog,
+    RoomDeleteDialog,
+  },
+  // @ts-ignore
+  head() {
+    return {
+      title: 'Rooms',
+    };
   },
   data() {
     return {
-      mdiClose,
       mdiPencil,
       mdiDelete,
     };
@@ -88,6 +118,7 @@ export default defineComponent({
     }
 
     const dialog = ref(false);
+    const deleteDialog = ref(false);
     const editedRoom = ref<Room | null>(null);
 
     setLoadState(false, true);
@@ -105,16 +136,21 @@ export default defineComponent({
 
           setLoadState(true, false);
         } catch (e) {
-          root.$router.replace('/login');
+          if (e.response.status === 401) {
+            root.$router.replace('/login');
+          }
         }
       } else {
         root.$router.replace('/login');
       }
     }
 
-    function newRoom() {
+    function newRoom(dialogToReset: any) {
       editedRoom.value = null;
       dialog.value = true;
+      if (dialogToReset) {
+        dialogToReset.$refs.observer.reset();
+      }
     }
 
     function editRoom(room: Room) {
@@ -123,12 +159,20 @@ export default defineComponent({
     }
 
     function deleteRoom(room: Room) {
-      console.log('Delete room: ' + room.name);
+      editedRoom.value = room;
+      deleteDialog.value = true;
     }
 
     function closeDialog() {
-      console.log('Closing dialog');
       dialog.value = false;
+    }
+
+    function closeDeleteDialog() {
+      deleteDialog.value = false;
+    }
+
+    function handleClick(room: Room) {
+      root.$router.replace('/room?id=' + room.id);
     }
 
     return {
@@ -140,8 +184,11 @@ export default defineComponent({
       editRoom,
       deleteRoom,
       dialog,
+      deleteDialog,
       editedRoom,
       closeDialog,
+      closeDeleteDialog,
+      handleClick,
     };
   },
 });

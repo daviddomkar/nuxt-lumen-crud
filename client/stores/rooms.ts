@@ -1,4 +1,4 @@
-import { toRefs } from '@vue/composition-api';
+import { toRefs, reactive } from '@vue/composition-api';
 import { createStore } from 'vue-state-composer';
 
 export type Room = {
@@ -30,13 +30,33 @@ export default createStore({
       state.loading = loading;
     };
 
-    const setRooms = (rooms: { [id: number]: Room }) => {
-      state.rooms = rooms;
+    const setRooms = (rooms: Array<Room>) => {
+      state.rooms = rooms.reduce((previous, current) => {
+        // @ts-ignore
+        previous[current.id] = reactive(current);
+
+        return previous;
+      }, {});
+    };
+
+    const setRoom = (room: Room) => {
+      if (state.rooms[room.id]) {
+        state.rooms[room.id] = room;
+      } else {
+        setRooms([...Object.values(state.rooms), room]);
+      }
+    };
+
+    const deleteRoom = (room: Room) => {
+      delete state.rooms[room.id];
+      setRooms([...Object.values(state.rooms)]);
     };
 
     return {
       ...toRefs(state),
       setRooms,
+      setRoom,
+      deleteRoom,
       setLoadState,
     };
   },

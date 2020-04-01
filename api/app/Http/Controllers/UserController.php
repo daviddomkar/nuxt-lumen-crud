@@ -69,14 +69,14 @@ class UserController extends Controller
         $data = $request->all();
 
         $validator = Validator::make($data, [
-            'first_name' => 'required_without_all:last_name,position,salary,room_id,username,password,admin|string|min:3|max:255',
-            'last_name' => 'required_without_all:first_name,position,salary,room_id,username,password,admin|string|min:3|max:255',
-            'position' => 'required_without_all:first_name,last_name,salary,room_id,username,password,admin|string|min:3|max:255',
-            'salary' => 'required_without_all:first_name,last_name,position,room_id,username,password,admin|numeric',
-            'room_id' => 'required_without_all:first_name,last_name,position,salary,username,password,admin|exists:rooms,id',
-            'username' => ['required_without_all:first_name,last_name,position,salary,room_id,password,admin', 'string', 'min:3', 'max:255', Rule::unique('users')->ignore($user)],
-            'password' => 'required_without_all:first_name,last_name,position,salary,room_id,username,admin|string|min:3|max:255',
-            'admin' => 'required_without_all:first_name,last_name,position,salary,room_id,username,password|boolean',
+            'first_name' => 'string|min:3|max:255',
+            'last_name' => 'string|min:3|max:255',
+            'position' => 'string|min:3|max:255',
+            'salary' => 'numeric',
+            'room_id' => 'exists:rooms,id',
+            'username' => ['string', 'min:3', 'max:255', Rule::unique('users')->ignore($user)],
+            'password' => 'string|min:8|max:255',
+            'admin' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -85,6 +85,10 @@ class UserController extends Controller
 
         if(array_key_exists('password', $data)) {
           $data['password'] = Hash::make($data['password']);
+        }
+
+        if($id == Auth::user()['id'] && array_key_exists('admin', $data) && $data['admin'] != Auth::user()['admin']) {
+          return response()->json(['error' => 'Forbidden'], 403);
         }
 
         $user->update($data);
@@ -97,7 +101,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if ($user['id'] == Auth::user()['id']) {
-            return response()->json(['error' => 'Method not allowed'], 405);
+            return response()->json(['error' => 'Forbidden'], 403);
         }
 
         $keys = Key::where('user_id', $user['id'])->get();

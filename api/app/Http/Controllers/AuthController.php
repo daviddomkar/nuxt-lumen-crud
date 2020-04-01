@@ -34,6 +34,25 @@ class AuthController extends Controller
         return response()->json(Auth::user(), 200);
     }
 
+    public function changeUsername(Request $request) 
+    {
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
+            'username' => 'required|string|min:3|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $user = Auth::user();
+
+        $user->update($data);
+
+        return response()->json(null, 204);
+    }
+
     public function changePassword(Request $request) 
     {
         $data = $request->all();

@@ -51,6 +51,7 @@
     "axios": "^0.19.2",
     "nuxt": "^2.0.0",
     "vee-validate": "^3.2.5",
+    "vue-currency-filter": "^4.0.3",
     "vue-state-composer": "^0.1.1"
   },
   "devDependencies": {

@@ -49,6 +49,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
         $router->group(['middleware' => 'auth'], function () use ($router) {
             $router->get('profile', 'AuthController@profile');    
+            $router->post('change-username', 'AuthController@changeUsername');
             $router->post('change-password', 'AuthController@changePassword');
             $router->post('logout', 'AuthController@logout');
         });

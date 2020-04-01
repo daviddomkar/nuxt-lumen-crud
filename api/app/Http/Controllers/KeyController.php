@@ -69,8 +69,8 @@ class KeyController extends Controller
         $data = $request->all();
 
         $validator = Validator::make($data, [
-            'user_id' => 'required_without_all:room_id|exists:users,id',
-            'room_id' => 'required_without_all:user_id|exists:rooms,id',
+            'user_id' => 'exists:users,id',
+            'room_id' => 'exists:rooms,id',
         ]);
 
         if ($validator->fails()) {

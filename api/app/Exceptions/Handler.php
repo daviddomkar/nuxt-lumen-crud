@@ -58,8 +58,8 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof QueryException) {
             return response()->json([
-                'error' => 'Not allowed'
-            ], 405);
+                'error' => 'Forbidden'
+            ], 403);
         }
 
         return parent::render($request, $exception);
