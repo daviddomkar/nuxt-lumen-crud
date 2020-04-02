@@ -7,6 +7,7 @@
       :loading="usersLoading || roomsLoading"
       loading-text="Loading data..."
       hide-default-footer
+      disable-pagination
       @click:row="handleClick"
     >
       <template v-slot:top>
@@ -39,7 +40,7 @@
             @click:outside="closeDeleteDialog"
           >
             <user-delete-dialog
-              :edited-user="editedUser"
+              :edited-user="deletedUser"
               @close="closeDeleteDialog"
             />
           </v-dialog>
@@ -149,6 +150,7 @@ export default defineComponent({
     const dialog = ref(false);
     const deleteDialog = ref(false);
     const editedUser = ref<User | null>(null);
+    const deletedUser = ref<User | null>(null);
 
     setUsersLoadState(false, true);
     setRoomsLoadState(false, true);
@@ -161,9 +163,7 @@ export default defineComponent({
       if (token.value) {
         try {
           const users = (await getUsers(token.value)).data;
-
           setUsers(users);
-
           setUsersLoadState(true, false);
         } catch (e) {
           root.$router.replace('/login');
@@ -203,11 +203,12 @@ export default defineComponent({
     }
 
     function deleteUser(user: User) {
-      editedUser.value = user;
+      deletedUser.value = user;
       deleteDialog.value = true;
     }
 
     function closeDialog() {
+      editedUser.value = null;
       dialog.value = false;
     }
 
@@ -229,6 +230,7 @@ export default defineComponent({
       dialog,
       deleteDialog,
       editedUser,
+      deletedUser,
       newUser,
       editUser,
       deleteUser,

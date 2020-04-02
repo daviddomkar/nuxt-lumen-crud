@@ -18,20 +18,40 @@ class UserController extends Controller
 
         $validator = Validator::make($data, [
           'room_id' => 'exists:rooms,id',
+          'room_id_keys' => 'exists:rooms,id',
         ]);
 
         if ($validator->fails()) {
           return response()->json($validator->errors(), 400);
         }
 
-        $users = array_key_exists('room_id', $data) ? User::where('room_id', $data['room_id'])->get() : User::all();
+        if (array_key_exists('room_id_keys', $data)) {
+            $users = Key::where('room_id', $data['room_id_keys'])->get()->map(function($item){
+                return User::findOrFail($item->user_id);
+            });
 
-        return response()->json($users, 200);
+            return response()->json($users, 200);
+        } else {
+            $users = array_key_exists('room_id', $data) ? User::where('room_id', $data['room_id'])->get() : User::all();
+
+            foreach ($users as $user) {
+              $user['keys'] = Key::where('user_id', $user['id'])->get()->map(function($item){
+                return $item->room_id;
+              });
+            }
+
+            return response()->json($users, 200);
+        }
+
     }
 
     public function show($id)
     {
         $user = User::findOrFail($id);
+
+        $user['keys'] = Key::where('user_id', $id)->get()->map(function($item){
+            return $item->room_id;
+        });
 
         return response()->json($user, 200);
     }

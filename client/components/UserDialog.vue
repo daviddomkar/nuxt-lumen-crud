@@ -112,7 +112,7 @@
               <validation-provider
                 v-slot="{ errors, reset }"
                 name="Password"
-                rules="min:8|max:255"
+                :rules="editedUser ? 'min:8|max:255' : 'required|min:8|max:255'"
               >
                 <v-text-field
                   v-model="user.password"
@@ -127,6 +127,17 @@
             </v-col>
             <v-col v-if="profile.id != user.id" cols="4">
               <v-checkbox v-model="user.admin" label="Is admin?" required />
+            </v-col>
+            <v-col cols="12">
+              <v-select
+                v-model="user.keys"
+                :items="Object.values(rooms)"
+                item-text="name"
+                item-value="id"
+                chips
+                label="Keys"
+                multiple
+              ></v-select>
             </v-col>
           </v-row>
         </form>
@@ -157,7 +168,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, watch } from '@vue/composition-api';
 import { mdiClose } from '@mdi/js';
-import { createUser, updateUser } from '@/utils/api';
+import { createUser, updateUser, createKey, deleteKey } from '@/utils/api';
 import usersStore, { User } from '@/stores/users';
 import roomsStore from '@/stores/rooms';
 import authStore from '@/stores/auth';
@@ -192,6 +203,7 @@ export default defineComponent({
             username: props.editedUser.username,
             password: props.editedUser.password,
             admin: props.editedUser.admin,
+            keys: props.editedUser.keys,
           }
         : {
             id: 0,
@@ -203,6 +215,7 @@ export default defineComponent({
             username: '',
             password: '',
             admin: false,
+            keys: [],
           },
     );
 
@@ -220,6 +233,7 @@ export default defineComponent({
               username: editedUser.username,
               password: editedUser.password,
               admin: editedUser.admin,
+              keys: editedUser.keys,
             }
           : {
               id: 0,
@@ -231,6 +245,7 @@ export default defineComponent({
               username: '',
               password: '',
               admin: false,
+              keys: [],
             };
       },
     );
@@ -249,11 +264,42 @@ export default defineComponent({
 
             if (props.editedUser) {
               const updated = await updateUser(token.value, user.value);
-              setUser(updated.data);
+
+              // @ts-ignore
+              for (const key of props.editedUser.keys) {
+                // @ts-ignore
+                if (!user.value.keys.includes(key)) {
+                  await deleteKey(token.value, props.editedUser.id, key);
+                }
+              }
+
+              // @ts-ignore
+              for (const key of user.value.keys) {
+                // @ts-ignore
+                if (!props.editedUser.keys.includes(key)) {
+                  await createKey(token.value, props.editedUser.id, key);
+                }
+              }
+
+              setUser({ ...updated.data, keys: user.value.keys });
             } else {
               const created = await createUser(token.value, user.value);
-              setUser(created.data);
+
+              if (user.value.keys && user.value.keys.length > 0) {
+                const keys = await Promise.all(
+                  user.value.keys.map((key) => {
+                    // @ts-ignore
+                    return createKey(token.value, created.data.id, key);
+                  }),
+                );
+
+                setUser({
+                  ...created.data,
+                  keys: keys.map((key) => key.data.room_id),
+                });
+              }
             }
+
             loading.value = false;
             emit('close');
           } catch (e) {

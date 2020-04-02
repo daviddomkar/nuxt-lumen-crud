@@ -72,6 +72,14 @@ export const getUsers = async (token: string, roomId: number | null = null) => {
   }
 };
 
+export const getUsersFromKeys = async (token: string, roomId: number) => {
+  return await client.get('/users?room_id_keys=' + roomId, {
+    headers: {
+      Authorization: 'Bearer ' + token,
+    },
+  });
+};
+
 export const getUser = async (token: string, id: number) => {
   return await client.get('/users/' + id, {
     headers: {
@@ -140,6 +148,38 @@ export const deleteRoom = async (token: string, room: Room) => {
   return await client.delete('/rooms/' + room.id, {
     headers: {
       Authorization: 'Bearer ' + token,
+    },
+  });
+};
+
+export const createKey = async (
+  token: string,
+  userId: number,
+  roomId: number,
+) => {
+  return await client.post(
+    '/keys',
+    { user_id: userId, room_id: roomId },
+    {
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    },
+  );
+};
+
+export const deleteKey = async (
+  token: string,
+  userId: number,
+  roomId: number,
+) => {
+  return await client.delete('/keys', {
+    headers: {
+      Authorization: 'Bearer ' + token,
+    },
+    data: {
+      user_id: userId,
+      room_id: roomId,
     },
   });
 };

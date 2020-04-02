@@ -26,9 +26,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('users', 'UserController@index');
         $router->get('users/{id}', 'UserController@show');
 
-        $router->get('keys', 'KeyController@index');
-        $router->get('keys/{id}', 'KeyController@show');
-
         $router->group(['middleware' => 'admin'], function () use ($router) {
             $router->post('rooms', 'RoomController@store');
             $router->put('rooms/{id}', 'RoomController@update');
@@ -39,8 +36,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->delete('users/{id}', 'UserController@delete');
 
             $router->post('keys', 'KeyController@store');
-            $router->put('keys/{id}', 'KeyController@update');
-            $router->delete('keys/{id}', 'KeyController@delete');
+            $router->delete('keys', 'KeyController@delete');
         });
     });
 

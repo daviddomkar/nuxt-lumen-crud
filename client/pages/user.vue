@@ -1,6 +1,6 @@
 <template>
   <v-row class="flex-column" no-gutters justify="center" align="center">
-    <v-card v-if="user && room" class="card flex-grow-1">
+    <v-card v-if="user" class="card flex-grow-1">
       <v-card-title class="subheading font-weight-bold">{{
         'User ' + user.first_name + ' ' + user.last_name
       }}</v-card-title>
@@ -23,7 +23,9 @@
       </v-row>
       <v-row class="ma-4" no-gutters justify="space-between">
         <span class="font-weight-bold">Room:</span>
-        <nuxt-link :to="'/room?id=' + room.id">{{ room.name }}</nuxt-link>
+        <nuxt-link :to="'/room?id=' + rooms[user.room_id].id">{{
+          rooms[user.room_id].name
+        }}</nuxt-link>
       </v-row>
       <v-row class="ma-4" no-gutters justify="space-between">
         <span class="font-weight-bold">Username:</span>
@@ -33,13 +35,22 @@
         <span class="font-weight-bold">Is admin:</span>
         <span>{{ !!user.admin }}</span>
       </v-row>
+      <div v-if="user.keys.length > 0">
+        <v-row
+          v-for="(key, index) in user.keys"
+          :key="key"
+          class="ma-4"
+          no-gutters
+          justify="space-between"
+        >
+          <span class="font-weight-bold">{{ index === 0 ? 'Keys:' : '' }}</span>
+          <nuxt-link :to="'/room?id=' + rooms[key].id">{{
+            rooms[key].name
+          }}</nuxt-link>
+        </v-row>
+      </div>
     </v-card>
-    <v-progress-circular
-      v-if="!(user && room)"
-      size="50"
-      indeterminate
-      color="primary"
-    />
+    <v-progress-circular v-if="!user" size="50" indeterminate color="primary" />
   </v-row>
 </template>
 
@@ -51,10 +62,10 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from '@vue/composition-api';
-import { getUser, getRoom } from '@/utils/api';
+import { getUser, getRooms } from '@/utils/api';
 import authStore from '@/stores/auth';
 import { User } from '@/stores/users';
-import { Room } from '@/stores/rooms';
+import roomsStore from '@/stores/rooms';
 
 export default defineComponent({
   // @ts-ignore
@@ -65,9 +76,9 @@ export default defineComponent({
   },
   setup(_, { root }) {
     const { token } = authStore.useConsumer();
+    const { setRooms, rooms } = roomsStore.useProvider();
 
     const user = ref<User | null>(null);
-    const room = ref<Room | null>(null);
 
     onMounted(() => {
       const id = root.$router.currentRoute.query.id;
@@ -87,9 +98,7 @@ export default defineComponent({
           }
 
           const userFromServer = (await getUser(token.value, Number(id))).data;
-          room.value = (
-            await getRoom(token.value, userFromServer.room_id)
-          ).data;
+          setRooms((await getRooms(token.value)).data);
           user.value = userFromServer;
         } catch (e) {
           root.$router.replace('/login');
@@ -101,7 +110,7 @@ export default defineComponent({
 
     return {
       user,
-      room,
+      rooms,
     };
   },
 });

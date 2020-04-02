@@ -11,6 +11,7 @@ export type User = {
   username: string;
   password: string | null;
   admin: boolean;
+  keys: Array<number> | null;
 };
 
 type State = {

@@ -12,6 +12,7 @@ import {
   digits,
   numeric,
   integer,
+  oneOf,
 } from 'vee-validate/dist/rules';
 
 setInteractionMode('eager');
@@ -53,6 +54,13 @@ extend('integer', {
   ...integer,
   message: (fieldName) => {
     return `The ${fieldName} field must be a whole number!`;
+  },
+});
+
+extend('oneOf', {
+  ...oneOf,
+  message: (fieldName) => {
+    return `The ${fieldName} field not be already selected!`;
   },
 });
 

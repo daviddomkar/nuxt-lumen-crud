@@ -32,6 +32,28 @@
             user.first_name + ' ' + user.last_name
           }}</nuxt-link>
         </v-row>
+        <v-row class="ma-4" no-gutters justify="space-between">
+          <span class="font-weight-bold">Average salary:</span>
+          <span>{{
+            (users.reduce((total, next) => total + next.salary, 0) /
+              users.length)
+              | currency
+          }}</span>
+        </v-row>
+      </div>
+      <div v-if="usersFromKeys.length > 0">
+        <v-row
+          v-for="(user, index) in usersFromKeys"
+          :key="user.id"
+          class="ma-4"
+          no-gutters
+          justify="space-between"
+        >
+          <span class="font-weight-bold">{{ index === 0 ? 'Keys:' : '' }}</span>
+          <nuxt-link :to="'/user?id=' + user.id">{{
+            user.first_name + ' ' + user.last_name
+          }}</nuxt-link>
+        </v-row>
       </div>
     </v-card>
     <v-progress-circular
@@ -51,7 +73,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from '@vue/composition-api';
-import { getRoom, getUsers } from '@/utils/api';
+import { getRoom, getUsers, getUsersFromKeys } from '@/utils/api';
 import authStore from '@/stores/auth';
 import { Room } from '@/stores/rooms';
 import { User } from '@/stores/users';
@@ -67,6 +89,7 @@ export default defineComponent({
     const { token } = authStore.useConsumer();
 
     const users = ref<Array<User> | null>(null);
+    const usersFromKeys = ref<Array<User> | null>(null);
     const room = ref<Room | null>(null);
 
     onMounted(() => {
@@ -88,6 +111,9 @@ export default defineComponent({
 
           const roomFromServer = (await getRoom(token.value, Number(id))).data;
           users.value = (await getUsers(token.value, roomFromServer.id)).data;
+          usersFromKeys.value = (
+            await getUsersFromKeys(token.value, roomFromServer.id)
+          ).data;
           room.value = roomFromServer;
         } catch (e) {
           root.$router.replace('/login');
@@ -100,6 +126,7 @@ export default defineComponent({
     return {
       room,
       users,
+      usersFromKeys,
     };
   },
 });
