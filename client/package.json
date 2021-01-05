@@ -48,7 +48,7 @@
     "@mdi/js": "^5.0.45",
     "@nuxt/typescript-runtime": "^0.4.0",
     "@vue/composition-api": "^0.5.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "nuxt": "^2.0.0",
     "vee-validate": "^3.2.5",
     "vue-currency-filter": "^4.0.3",
